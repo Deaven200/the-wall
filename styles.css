@@ -30,41 +30,6 @@ body {
     height: 100vh;
 }
 
-.header {
-    padding: 20px;
-    background: linear-gradient(135deg, rgba(0, 255, 255, 0.1), rgba(255, 0, 255, 0.1));
-    border-bottom: 2px solid var(--neon-cyan);
-    box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
-}
-
-.header h1 {
-    font-size: 2.5rem;
-    margin-bottom: 10px;
-    text-shadow: 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-magenta);
-    letter-spacing: 3px;
-}
-
-.stats {
-    display: flex;
-    gap: 30px;
-    font-size: 1.1rem;
-}
-
-.stat {
-    display: flex;
-    gap: 8px;
-}
-
-.stat .label {
-    color: var(--neon-cyan);
-}
-
-.stat .value {
-    color: var(--neon-green);
-    font-weight: bold;
-    text-shadow: 0 0 10px var(--neon-green);
-}
-
 .game-wrapper {
     display: flex;
     flex: 1;
@@ -82,43 +47,61 @@ canvas {
 }
 
 .sidebar {
-    width: 280px;
+    width: 200px;
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 10px;
     overflow-y: auto;
 }
 
 .panel {
     background: rgba(0, 255, 255, 0.05);
-    border: 2px solid var(--neon-magenta);
-    padding: 15px;
-    box-shadow: 0 0 15px rgba(255, 0, 255, 0.3);
+    border: 1px solid var(--neon-magenta);
+    padding: 12px;
+    box-shadow: 0 0 10px rgba(255, 0, 255, 0.2);
 }
 
-.panel h2 {
-    font-size: 1.2rem;
+.panel h3 {
+    font-size: 0.9rem;
     color: var(--neon-magenta);
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     text-shadow: 0 0 10px var(--neon-magenta);
 }
 
 .panel p {
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     color: var(--text-light);
-    margin-bottom: 8px;
+    margin-bottom: 6px;
     line-height: 1.4;
+}
+
+.stat {
+    display: flex;
+    gap: 8px;
+    font-size: 0.9rem;
+    margin-bottom: 6px;
+}
+
+.stat .label {
+    color: var(--neon-cyan);
+}
+
+.stat .value {
+    color: var(--neon-green);
+    font-weight: bold;
+    text-shadow: 0 0 5px var(--neon-green);
 }
 
 .cost {
     color: var(--neon-yellow);
     font-weight: bold;
+    font-size: 0.8rem;
 }
 
 .btn {
     width: 100%;
-    padding: 10px;
-    border: 2px solid var(--neon-green);
+    padding: 8px;
+    border: 1px solid var(--neon-green);
     background: rgba(0, 255, 0, 0.1);
     color: var(--neon-green);
     font-family: 'Courier New', monospace;
@@ -126,12 +109,12 @@ canvas {
     cursor: pointer;
     transition: all 0.3s;
     text-shadow: 0 0 5px var(--neon-green);
-    margin-bottom: 10px;
+    font-size: 0.8rem;
 }
 
 .btn:hover:not(:disabled) {
     background: rgba(0, 255, 0, 0.3);
-    box-shadow: 0 0 20px var(--neon-green);
+    box-shadow: 0 0 15px var(--neon-green);
 }
 
 .btn:active:not(:disabled) {
@@ -143,30 +126,25 @@ canvas {
     cursor: not-allowed;
 }
 
-.btn-build {
-    border-color: var(--neon-green);
-    color: var(--neon-green);
-}
-
 .resource-list {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
 }
 
 .resource-item {
     background: rgba(0, 128, 255, 0.1);
     border: 1px solid var(--neon-blue);
-    padding: 8px;
-    border-radius: 4px;
-    font-size: 0.85rem;
+    padding: 6px;
+    border-radius: 2px;
+    font-size: 0.75rem;
     cursor: pointer;
     transition: all 0.2s;
 }
 
 .resource-item:hover {
     background: rgba(0, 128, 255, 0.3);
-    box-shadow: 0 0 10px var(--neon-blue);
+    box-shadow: 0 0 8px var(--neon-blue);
 }
 
 .resource-name {
@@ -176,12 +154,12 @@ canvas {
 
 .resource-amount {
     color: var(--neon-yellow);
-    font-size: 0.8rem;
+    font-size: 0.7rem;
 }
 
 /* Scrollbar styling */
 .sidebar::-webkit-scrollbar {
-    width: 8px;
+    width: 6px;
 }
 
 .sidebar::-webkit-scrollbar-track {
@@ -190,27 +168,9 @@ canvas {
 
 .sidebar::-webkit-scrollbar-thumb {
     background: var(--neon-magenta);
-    border-radius: 4px;
+    border-radius: 3px;
 }
 
 .sidebar::-webkit-scrollbar-thumb:hover {
     background: var(--neon-cyan);
-}
-
-@media (max-width: 1024px) {
-    .game-wrapper {
-        flex-direction: column;
-    }
-    
-    .sidebar {
-        width: 100%;
-        height: 200px;
-        flex-direction: row;
-        overflow-x: auto;
-    }
-    
-    .panel {
-        flex: 1;
-        min-width: 250px;
-    }
 }
