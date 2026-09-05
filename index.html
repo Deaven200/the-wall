@@ -8,46 +8,40 @@
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>THE WALL</h1>
-            <div class="stats">
-                <div class="stat">
-                    <span class="label">Resources:</span>
-                    <span class="value" id="resourceCount">0</span>
-                </div>
-                <div class="stat">
-                    <span class="label">Wall Health:</span>
-                    <span class="value" id="wallHealth">100</span>%
-                </div>
-                <div class="stat">
-                    <span class="label">Turrets:</span>
-                    <span class="value" id="turretCount">0</span>
-                </div>
-            </div>
-        </div>
-        
         <div class="game-wrapper">
             <canvas id="gameCanvas"></canvas>
             
             <div class="sidebar">
                 <div class="panel">
-                    <h2>Build Turret</h2>
-                    <p class="cost">Cost: <span id="turretCost">20</span> resources</p>
-                    <button id="buildTurretBtn" class="btn btn-build">Build (Click on map)</button>
-                </div>
-                
-                <div class="panel">
-                    <h2>Resource Patches</h2>
-                    <div id="resourceList" class="resource-list">
-                        <!-- Dynamic resource patches will appear here -->
+                    <div class="stat">
+                        <span class="label">Resources:</span>
+                        <span class="value" id="resourceCount">0</span>
                     </div>
                 </div>
                 
                 <div class="panel">
-                    <h2>Info</h2>
-                    <p>Click resource patches to gather resources.</p>
-                    <p>Build turrets to destroy the descending wall.</p>
-                    <p>Expand your resource network!</p>
+                    <div class="stat">
+                        <span class="label">Wall Health:</span>
+                        <span class="value" id="wallHealth">100</span>
+                    </div>
+                </div>
+                
+                <div class="panel">
+                    <div class="stat">
+                        <span class="label">Turrets:</span>
+                        <span class="value" id="turretCount">0</span>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <p class="cost">Cost: <span id="turretCost">20</span></p>
+                    <button id="buildTurretBtn" class="btn btn-build">Build Turret</button>
+                </div>
+
+                <div class="panel">
+                    <h3>Patches</h3>
+                    <div id="resourceList" class="resource-list">
+                    </div>
                 </div>
             </div>
         </div>
