@@ -4,8 +4,8 @@ const CONFIG = {
     TURRET_FIRE_RATE: 0.5, // seconds
     TURRET_RANGE: 100,
     TURRET_DAMAGE: 10,
-    WALL_SPEED: 20, // pixels per second
-    WALL_HEALTH_MAX: 100,
+    WALL_SPEED: 30, // pixels per second
+    WALL_HEALTH_MAX: 500,
     RESOURCE_GATHER_RATE: 2, // resources per second per patch
 };
 
@@ -22,13 +22,13 @@ let gameState = {
 // Canvas Setup
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
-canvas.width = window.innerWidth - 320;
-canvas.height = window.innerHeight - 120;
+canvas.width = window.innerWidth - 240;
+canvas.height = window.innerHeight - 40;
 
 // Resize canvas on window resize
 window.addEventListener('resize', () => {
-    canvas.width = window.innerWidth - 320;
-    canvas.height = window.innerHeight - 120;
+    canvas.width = window.innerWidth - 240;
+    canvas.height = window.innerHeight - 40;
 });
 
 // Neon Colors
@@ -44,11 +44,11 @@ const COLORS = {
 
 // Classes
 class Wall {
-    constructor(x, y, width, height) {
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
+    constructor() {
+        this.x = 0;
+        this.y = -200;
+        this.width = canvas.width;
+        this.height = 200; // Tall solid block
         this.health = CONFIG.WALL_HEALTH_MAX;
         this.maxHealth = CONFIG.WALL_HEALTH_MAX;
     }
@@ -62,29 +62,41 @@ class Wall {
     }
 
     draw(ctx) {
-        // Draw main wall body with neon effect
+        // Draw main wall body - solid mass
         ctx.fillStyle = COLORS.magenta;
         ctx.fillRect(this.x, this.y, this.width, this.height);
 
-        // Neon glow
+        // Neon glow border
         ctx.shadowColor = COLORS.magenta;
-        ctx.shadowBlur = 20;
+        ctx.shadowBlur = 25;
         ctx.strokeStyle = COLORS.cyan;
-        ctx.lineWidth = 3;
+        ctx.lineWidth = 2;
         ctx.strokeRect(this.x, this.y, this.width, this.height);
         ctx.shadowBlur = 0;
 
-        // Health bar
-        const barWidth = this.width;
-        const barHeight = 8;
-        const barY = this.y - 15;
-        
+        // Damage texture
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+        for (let i = 0; i < 20; i++) {
+            const x = this.x + Math.random() * this.width;
+            const y = this.y + Math.random() * this.height;
+            const size = Math.random() * 8 + 2;
+            ctx.fillRect(x, y, size, size);
+        }
+
+        // Health bar at bottom of wall
+        const barHeight = 15;
         ctx.fillStyle = 'rgba(255, 0, 255, 0.3)';
-        ctx.fillRect(this.x, barY, barWidth, barHeight);
+        ctx.fillRect(this.x, this.y + this.height - barHeight, this.width, barHeight);
         
         ctx.fillStyle = COLORS.green;
-        const healthPercent = this.health / this.maxHealth;
-        ctx.fillRect(this.x, barY, barWidth * healthPercent, barHeight);
+        const healthPercent = Math.max(0, this.health / this.maxHealth);
+        ctx.fillRect(this.x, this.y + this.height - barHeight, this.width * healthPercent, barHeight);
+        
+        // Health text
+        ctx.fillStyle = COLORS.yellow;
+        ctx.font = '12px Courier New';
+        ctx.textAlign = 'center';
+        ctx.fillText(`HP: ${Math.max(0, Math.floor(this.health))}`, this.x + this.width / 2, this.y + this.height - 2);
     }
 
     isDefeated() {
@@ -100,6 +112,7 @@ class Turret {
     constructor(x, y) {
         this.x = x;
         this.y = y;
+        this.size = 16; // Square size
         this.range = CONFIG.TURRET_RANGE;
         this.damage = CONFIG.TURRET_DAMAGE;
         this.fireRate = CONFIG.TURRET_FIRE_RATE;
@@ -108,10 +121,12 @@ class Turret {
     }
 
     update(deltaTime, wall) {
+        // Calculate angle to wall center
         const dx = wall.x + wall.width / 2 - this.x;
         const dy = wall.y + wall.height / 2 - this.y;
         this.rotation = Math.atan2(dy, dx);
 
+        // Check if wall is in range
         const distance = Math.sqrt(dx * dx + dy * dy);
         if (distance < this.range) {
             this.lastShotTime += deltaTime;
@@ -125,36 +140,32 @@ class Turret {
     }
 
     draw(ctx) {
-        // Base
+        // Draw turret base as square
         ctx.fillStyle = COLORS.cyan;
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, 15, 0, Math.PI * 2);
-        ctx.fill();
+        ctx.fillRect(this.x - this.size / 2, this.y - this.size / 2, this.size, this.size);
 
         // Neon glow on base
         ctx.shadowColor = COLORS.cyan;
         ctx.shadowBlur = 15;
         ctx.strokeStyle = COLORS.blue;
         ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, 15, 0, Math.PI * 2);
-        ctx.stroke();
+        ctx.strokeRect(this.x - this.size / 2, this.y - this.size / 2, this.size, this.size);
         ctx.shadowBlur = 0;
 
-        // Barrel
-        const barrelLength = 20;
+        // Barrel - green line pointing at wall
+        const barrelLength = 22;
         const barrelX = this.x + Math.cos(this.rotation) * barrelLength;
         const barrelY = this.y + Math.sin(this.rotation) * barrelLength;
         
         ctx.strokeStyle = COLORS.green;
-        ctx.lineWidth = 4;
+        ctx.lineWidth = 3;
         ctx.beginPath();
         ctx.moveTo(this.x, this.y);
         ctx.lineTo(barrelX, barrelY);
         ctx.stroke();
 
-        // Range indicator (subtle)
-        ctx.strokeStyle = 'rgba(0, 255, 255, 0.2)';
+        // Range indicator (very subtle)
+        ctx.strokeStyle = 'rgba(0, 255, 255, 0.15)';
         ctx.lineWidth = 1;
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.range, 0, Math.PI * 2);
@@ -180,7 +191,7 @@ class ResourcePatch {
     }
 
     draw(ctx) {
-        // Outer ring
+        // Outer ring - changes color when active
         ctx.strokeStyle = this.isActive ? COLORS.green : COLORS.yellow;
         ctx.lineWidth = 3;
         ctx.shadowColor = this.isActive ? COLORS.green : COLORS.yellow;
@@ -198,12 +209,14 @@ class ResourcePatch {
         ctx.fill();
         ctx.globalAlpha = 1;
 
-        // Resource indicator
+        // Resource indicator - circular progress
         const resourcePercent = this.resources / this.maxResources;
         ctx.fillStyle = COLORS.yellow;
         ctx.globalAlpha = 0.8;
         ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size * 0.3, 0, Math.PI * 2 * resourcePercent);
+        ctx.moveTo(this.x, this.y - this.size * 0.3);
+        ctx.arc(this.x, this.y, this.size * 0.3, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * resourcePercent);
+        ctx.lineTo(this.x, this.y);
         ctx.fill();
         ctx.globalAlpha = 1;
     }
@@ -215,25 +228,35 @@ class ResourcePatch {
 
 // Initialize Game
 function initGame() {
-    // Create the descending wall
-    gameState.wall = new Wall(canvas.width / 2 - 100, -50, 200, 40);
+    // Create the descending wall as infinite solid mass
+    gameState.wall = new Wall();
 
     // Create resource patches scattered around the map
-    const patchCount = 5;
+    const patchCount = 6;
     for (let i = 0; i < patchCount; i++) {
         const x = Math.random() * (canvas.width - 100) + 50;
-        const y = Math.random() * (canvas.height - 200) + 100;
-        const patch = new ResourcePatch(x, y, 20, 100);
+        const y = Math.random() * (canvas.height * 0.7) + 100;
+        const patch = new ResourcePatch(x, y, 18, 150);
         gameState.resourcePatches.push(patch);
     }
 
     // Event listeners
+    let buildMode = false;
+    
     document.getElementById('buildTurretBtn').addEventListener('click', () => {
-        canvas.style.cursor = 'crosshair';
-        alert('Click on the canvas to place a turret');
+        buildMode = !buildMode;
+        if (buildMode) {
+            canvas.style.cursor = 'crosshair';
+            document.getElementById('buildTurretBtn').textContent = 'Place Turret (ESC)';
+        } else {
+            canvas.style.cursor = 'default';
+            document.getElementById('buildTurretBtn').textContent = 'Build Turret';
+        }
     });
 
     canvas.addEventListener('click', (e) => {
+        if (!buildMode) return;
+
         const rect = canvas.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
@@ -241,9 +264,21 @@ function initGame() {
         if (gameState.resources >= CONFIG.TURRET_COST) {
             gameState.turrets.push(new Turret(x, y));
             gameState.resources -= CONFIG.TURRET_COST;
+            buildMode = false;
+            canvas.style.cursor = 'default';
+            document.getElementById('buildTurretBtn').textContent = 'Build Turret';
             updateUI();
         } else {
-            alert('Not enough resources!');
+            console.log('Not enough resources!');
+        }
+    });
+
+    // ESC to cancel build mode
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && buildMode) {
+            buildMode = false;
+            canvas.style.cursor = 'default';
+            document.getElementById('buildTurretBtn').textContent = 'Build Turret';
         }
     });
 
@@ -255,7 +290,7 @@ function initGame() {
         // Check if hovering over resource patch
         gameState.resourcePatches.forEach(patch => {
             const distance = Math.sqrt((patch.x - x) ** 2 + (patch.y - y) ** 2);
-            patch.isActive = distance < patch.size + 20;
+            patch.isActive = distance < patch.size + 25;
         });
     });
 
@@ -279,7 +314,7 @@ function update(deltaTime) {
     // Update wall
     gameState.wall.update(deltaTime);
 
-    // Update turrets and check for wall hits
+    // Update turrets
     gameState.turrets.forEach(turret => {
         turret.update(deltaTime, gameState.wall);
     });
@@ -291,18 +326,16 @@ function update(deltaTime) {
         }
     });
 
-    // Remove depleted patches and defeated walls
+    // Remove depleted patches
     gameState.resourcePatches = gameState.resourcePatches.filter(p => !p.isDepleted());
 
     // Check win/lose conditions
     if (gameState.wall.isDefeated()) {
-        console.log('Wall destroyed!');
-        // TODO: Victory state
+        console.log('Wall destroyed! Victory!');
     }
 
     if (gameState.wall.hasReachedBottom(canvas.height)) {
         console.log('Game Over! Wall reached bottom');
-        // TODO: Game over state
     }
 
     gameState.gameTime += deltaTime;
@@ -314,7 +347,7 @@ function draw() {
     ctx.fillStyle = COLORS.darkBg;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Draw grid (optional visual aid)
+    // Draw subtle grid
     ctx.strokeStyle = 'rgba(0, 255, 255, 0.05)';
     ctx.lineWidth = 1;
     for (let i = 0; i < canvas.width; i += 50) {
